@@ -69,7 +69,14 @@ jobs:
           command: sudo pip install awscli
       - run:
           name: Deploy to AWS Layers
-          command: aws lambda publish-layer-version --layer-name haskell-runtime --zip-file fileb://runtime.zip
+          command: |
+            LAYER_NAME="haskell-runtime"
+            REGIONS_LIST="us-east-1 us-east-2 us-west-1 us-west-2 ap-south-1 ap-northeast-2 ap-southeast-1 ap-southeast-2 ap-northeast-1 ca-central-1 eu-central-1 eu-west-1 eu-west-2 eu-west-3 eu-north-1 sa-east-1"
+            for $region in $REGIONS_LIST
+            do
+              aws lambda publish-layer-version --layer-name $LAYER_NAME --zip-file fileb://runtime.zip --region $region
+              aws lambda add-layer-version-permission --layer-name $LAYER_NAME --version-number $(aws lambda list-layer-versions --layer-name $LAYER_NAME --region $region | grep Version | tail -n+3 | head -n 1 | cut -d: -f2- | rev | cut -d, -f2 | rev) --principal '*' --action lambda:GetLayerVersion --statement-id allow-getLayerVersion-all --region $region
+            done
       - run:
           name: Update README
           command: |
