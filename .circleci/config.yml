@@ -68,6 +68,7 @@ jobs:
       - image: circleci/python:2.7-jessie
     working_directory: ~/aws-lambda-haskell-runtime
     steps:
+      - checkout
       - restore-cache:
           keys: zip-file-{{checksum "stack.yaml"}}-{{checksum "package.yaml"}}
           paths:
