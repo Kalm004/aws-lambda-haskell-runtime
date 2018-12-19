@@ -22,7 +22,7 @@ jobs:
       - run: stack build
       - run: zip /tmp/runtime.zip $(stack path --local-install-root)/bin/bootstrap
       - save-cache:
-          key: zip-{{checksum "stack.yaml"}}-{{checksum "package.yaml"}}
+          key: zip-file
           paths:
             - "/tmp/runtime.zip"
       - save-cache:
@@ -70,7 +70,7 @@ jobs:
     steps:
       - checkout
       - restore-cache:
-          keys: zip-file-{{checksum "stack.yaml"}}-{{checksum "package.yaml"}}
+          keys: zip-file
           paths:
             - "/tmp/"
       - run:
