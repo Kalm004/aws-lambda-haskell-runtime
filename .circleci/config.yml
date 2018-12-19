@@ -100,6 +100,6 @@ workflows:
     jobs:
       - build
       - deploy
-            type: approval
-            requires: 
-              - test
+        type: approval
+        requires: 
+          - test
