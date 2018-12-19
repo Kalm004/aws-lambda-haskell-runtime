@@ -99,9 +99,6 @@ workflows:
   build-and-deploy:
     jobs:
       - build
-      - test
-          requires:
-            - build
       - deploy
           type: approval
           requires: 
