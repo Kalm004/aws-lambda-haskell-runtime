@@ -64,6 +64,16 @@ jobs:
       - image: circleci/python:2.7-jessie
     working_directory: ~/aws-lambda-haskell-runtime
     steps:
+      - checkout
+      - restore-cache:
+          keys:
+            - stack-{{ checksum "stack.yaml" }}
+      - restore-cache:
+          keys:
+            - stack-{{checksum "stack.yaml"}}-{{checksum "package.yaml"}}
+      - run: stack setup
+      - run: stack build
+      - run: zip runtime.zip $(stack path --local-install-root)/bin/bootstrap
       - run:
           name: Install awscli
           command: sudo pip install awscli
@@ -98,10 +108,4 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
-      - build
-      - test:
-          requires:
-            - build
-      - deploy:
-          requires: 
-            - test
+      - deploy
