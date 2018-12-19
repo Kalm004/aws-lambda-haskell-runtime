@@ -22,6 +22,10 @@ jobs:
       - run: stack build
       - run: zip runtime.zip $(stack path --local-install-root)/bin/bootstrap
       - save-cache:
+          key: zip-file
+          paths:
+            - "./runtime.zip"
+      - save-cache:
           key: stack-{{ checksum "stack.yaml" }}
           paths:
             - "~/.stack"
@@ -64,7 +68,10 @@ jobs:
       - image: circleci/python:2.7-jessie
     working_directory: ~/aws-lambda-haskell-runtime
     steps:
-      - run: zip runtime.zip $(stack path --local-install-root)/bin/bootstrap
+      - restore-cache:
+        key: zip-file
+        paths:
+          - "./"
       - run:
           name: Install awscli
           command: sudo pip install awscli
