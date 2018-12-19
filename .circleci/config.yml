@@ -20,11 +20,11 @@ jobs:
             - stack-{{checksum "stack.yaml"}}-{{checksum "package.yaml"}}
       - run: stack setup
       - run: stack build
-      - run: zip runtime.zip $(stack path --local-install-root)/bin/bootstrap
+      - run: zip /tmp/runtime.zip $(stack path --local-install-root)/bin/bootstrap
       - save-cache:
           key: zip-file
           paths:
-            - "./runtime.zip"
+            - "/tmp/runtime.zip"
       - save-cache:
           key: stack-{{ checksum "stack.yaml" }}
           paths:
@@ -71,7 +71,7 @@ jobs:
       - restore-cache:
           keys: zip-file
           paths:
-            - "./"
+            - "/tmp/"
       - run:
           name: Install awscli
           command: sudo pip install awscli
