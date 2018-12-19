@@ -100,9 +100,3 @@ workflows:
     jobs:
       - build
       - test
-
-general:
-  branches:
-    only:
-      - master
-      - multi-region-deployment
