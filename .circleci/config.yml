@@ -39,6 +39,14 @@ jobs:
       TEST_RESULTS: /tmp/test-results
 
     steps:
+      - checkout
+      - restore-cache:
+          keys:
+            - stack-{{ checksum "stack.yaml" }}
+      - restore-cache:
+          keys:
+            - stack-{{checksum "stack.yaml"}}-{{checksum "package.yaml"}}
+      - run: stack setup
       - run: stack test
       - save-cache:
           key: stack-{{ checksum "stack.yaml" }}
@@ -92,9 +100,7 @@ workflows:
     jobs:
       - build
       - test
-          requires:
-            - build
+          requires: build
       - deploy
-          type: approval
-          requires:
-            - test
+        type: approval
+          requires: test
