@@ -60,6 +60,7 @@ jobs:
           path: ~/.stack-work/logs/*
 
   deploy:
+    <<: *defaults
     docker:
       - image: circleci/python:2.7-jessie
     working_directory: ~/aws-lambda-haskell-runtime
