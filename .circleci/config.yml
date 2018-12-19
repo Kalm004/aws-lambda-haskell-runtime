@@ -22,7 +22,7 @@ jobs:
       - run: stack build
       - run: zip /tmp/runtime.zip $(stack path --local-install-root)/bin/bootstrap
       - save-cache:
-          key: zip-file-tmp
+          key: zip-{{checksum "stack.yaml"}}-{{checksum "package.yaml"}}
           paths:
             - "/tmp/runtime.zip"
       - save-cache:
@@ -69,7 +69,7 @@ jobs:
     working_directory: ~/aws-lambda-haskell-runtime
     steps:
       - restore-cache:
-          keys: zip-file-tmp
+          keys: zip-file-{{checksum "stack.yaml"}}-{{checksum "package.yaml"}}
           paths:
             - "/tmp/"
       - run:
@@ -85,22 +85,6 @@ jobs:
               aws lambda publish-layer-version --layer-name $LAYER_NAME --zip-file fileb:///tmp/runtime.zip --region $region
               aws lambda add-layer-version-permission --layer-name $LAYER_NAME --version-number $(aws lambda list-layer-versions --layer-name $LAYER_NAME --region $region | grep Version | tail -n+3 | head -n 1 | cut -d: -f2- | rev | cut -d, -f2 | rev) --principal '*' --action lambda:GetLayerVersion --statement-id allow-getLayerVersion-all --region $region
             done
-      - run:
-          name: Update README
-          command: |
-            git clone --depth 1 https://${DOCS_GITHUB_TOKEN}@github.com/theam/aws-lambda-haskell-runtime.git runtime
-            cd runtime
-            sed -i '$ d' README.md
-            echo "\`$(aws lambda list-layer-versions --layer-name haskell-runtime | grep LayerVersionArn | head -n 1 | cut -d: -f2- | cut -d\" -f2)\`" >> README.md
-            git config credential.helper 'cache --timeout=120'
-            git config user.email "nikitatchayka@gmail.com"
-            git config user.name "Layer deployment bot"
-            git add README.md
-            git commit --allow-empty -m "Update ARN"
-            # Push quietly to prevent showing the token in log
-            git push -q https://${DOCS_GITHUB_TOKEN}@github.com/theam/aws-lambda-haskell-runtime.git master
-
-
 
 workflows:
   version: 2
